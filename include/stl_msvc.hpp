@@ -66,7 +66,10 @@ namespace std {
 
     //! implements binary tuple, i.e. a pair of values
     template <typename T0, typename T1>
-    struct pair;
+    struct pair {
+        T0 first;
+        T1 second;
+    };
 
     //! static contiguous array
     template <typename T, size_t N>

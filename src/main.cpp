@@ -16,6 +16,9 @@
 
 #define TEST(message, ...) static_assert(sizeof(std::__VA_ARGS__) == sizeof(STL_MSVC_NS::__VA_ARGS__), message)
 
+struct empty_t1 {};
+struct empty_t2 {};
+
 int main() {
     TEST("array basic", array<char, 1>);
 
@@ -28,6 +31,9 @@ int main() {
     TEST("span", span<char>);
     TEST("span", span<char, 1>);
     TEST("span", span<char, (size_t)-1>);
+
+    TEST("pair of ints", pair<int, int>);
+    TEST("pair of int and char", pair<int, char>);
 
     return 0;
 }
