@@ -83,8 +83,20 @@ namespace std {
     };
 
     //! a non-owning view over a contiguous sequence of objects
+    //! @note size is known at compiletime
     template <typename T, size_t E = (size_t)-1>
-    struct span;
+    struct span {
+        T* ptr;
+        static constexpr inline size_t count = E;
+    };
+
+    //! a non-owning view over a contiguous sequence of objects
+    //! @note size is only known at runtime
+    template <typename T>
+    struct span<T, (size_t)-1> {
+        T* ptr;
+        size_t count;
+    };
 
     //! stores and manipulates sequences of characters
     template <typename C, typename T = char_traits<C>>

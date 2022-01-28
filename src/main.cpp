@@ -25,5 +25,9 @@ int main() {
     TEST("bitset 32", bitset<32>);
     TEST("bitset 65", bitset<65>);
 
+    TEST("span", span<char>);
+    TEST("span", span<char, 1>);
+    TEST("span", span<char, (size_t)-1>);
+
     return 0;
 }
