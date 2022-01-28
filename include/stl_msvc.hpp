@@ -62,7 +62,7 @@ namespace std {
 
     //! conditonal_t is TrueT or FalseT depending on Condition
     template <bool Condition, typename TrueT, typename FalseT>
-    using conditonal_t = typename conditional<Condition, TrueT, FalseT>::type;
+    using conditional_t = typename conditional<Condition, TrueT, FalseT>::type;
 
     //! implements binary tuple, i.e. a pair of values
     template <typename T0, typename T1>
@@ -70,11 +70,17 @@ namespace std {
 
     //! static contiguous array
     template <typename T, size_t N>
-    struct array;
+    struct array {
+        T data[N];
+    };
 
     //! implements constant length bit array
     template <size_t N>
-    struct bitset;
+    struct bitset {
+        using word_t = conditional_t<N <= sizeof(unsigned long) * 8, unsigned long, unsigned long long>;
+        static constexpr inline size_t words_per_bit = sizeof(word_t) * 8;
+        word_t words[N == 0 ? 1 : (N + words_per_bit - 1) / words_per_bit];
+    };
 
     //! a non-owning view over a contiguous sequence of objects
     template <typename T, size_t E = (size_t)-1>
