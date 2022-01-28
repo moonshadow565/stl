@@ -96,6 +96,8 @@ namespace std {
     //! @note size is known at compiletime
     template <typename T, size_t E = (size_t)-1>
     struct span {
+        using iterator = T*;
+
         T* data;
         static constexpr inline size_t size = E;
     };
@@ -104,6 +106,8 @@ namespace std {
     //! @note size is only known at runtime
     template <typename T>
     struct span<T, (size_t)-1> {
+        using iterator = T*;
+
         T* data;
         size_t size;
     };
@@ -111,6 +115,8 @@ namespace std {
     //! stores and manipulates sequences of characters
     template <typename C, typename T = char_traits<C>>
     struct basic_string_view {
+        using iterator = C*;
+
         C* data;
         size_t size;
     };
@@ -137,7 +143,10 @@ namespace std {
         union data_t {
             C* big;
             C small[16 / sizeof(C)];
-        } data;
+        };
+        using iterator = C*;
+
+        data_t data;
         size_t size;
         size_t reserved;
     };
@@ -160,6 +169,8 @@ namespace std {
     //! dynamic contiguous array
     template <typename T, typename A = allocator<T>>
     struct vector : A {
+        using iterator = T*;
+
         // [[msvc::no_unique_address]] A alloc;
         T* beg;
         T* end;
@@ -175,16 +186,40 @@ namespace std {
         };
 
         vector<unsigned int, A> data;
-        size_t count;
+        size_t size;
     };
 
     //! singly-linked list
     template <typename T, typename A = allocator<T>>
-    struct forward_list;
+    struct forward_list : A {
+        struct node_t {
+            node_t* next;
+            T value;
+        };
+        struct iterator {
+            node_t* ptr;
+        };
+
+        // [[msvc::no_unique_address]] A alloc;
+        node_t* head;
+    };
 
     //! doubly-linked list
     template <typename T, typename A = allocator<T>>
-    struct list;
+    struct list : A {
+        struct node_t {
+            node_t* prev;
+            node_t* next;
+            T value;
+        };
+        struct iterator {
+            node_t* ptr;
+        };
+
+        // [[msvc::no_unique_address]] A alloc;
+        node_t* head;
+        size_t size;
+    };
 
     //! collection of unique keys, sorted by keys
     template <typename K, typename L = less<K>, typename A = allocator<K>>

@@ -3,7 +3,9 @@
 #include <array>
 #include <bitset>
 #include <deque>
+#include <forward_list>
 #include <functional>
+#include <list>
 #include <map>
 #include <memory_resource>
 #include <optional>
@@ -78,6 +80,11 @@ int main() {
     TEST("optional of optional", optional<optional<char>>);
 
     TEST("vector of char", vector<char>);
+    TEST("vector of bool", vector<bool>);
+
+    TEST("forward_list", forward_list<int>);
+
+    TEST("list", list<int>);
 
     return 0;
 }
