@@ -152,7 +152,10 @@ namespace std {
 
     //! a wrapper that may or may not hold an object
     template <typename T>
-    struct option;
+    struct optional {
+        T value;
+        bool has_value;
+    };
 
     //! placeholder type for use as the first alternative in a variant of non-default-constructible types
     struct monostate {};

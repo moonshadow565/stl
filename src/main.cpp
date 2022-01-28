@@ -16,13 +16,24 @@
 #define STL_MSVC_NS test
 #include "stl_msvc.hpp"
 
-#define TEST(message, ...) static_assert(sizeof(std::__VA_ARGS__) == sizeof(STL_MSVC_NS::__VA_ARGS__), message)
+#define TEST(message, ...)                   \
+    static_assert(                           \
+        [] {                                 \
+            using namespace std;             \
+            return sizeof(__VA_ARGS__);      \
+        }() ==                               \
+            [] {                             \
+                using namespace STL_MSVC_NS; \
+                return sizeof(__VA_ARGS__);  \
+            }(),                             \
+        message)
 
 struct empty_t1 {};
 struct empty_t2 {};
 
 int main() {
     TEST("array basic", array<char, 1>);
+    TEST("array of array", array<array<int, 3>, 5>);
 
     TEST("bitset 0", bitset<0>);
     TEST("bitset 7", bitset<7>);
@@ -46,6 +57,11 @@ int main() {
     TEST("u8string", u8string);
     TEST("u16string", u16string);
     TEST("u32string", u32string);
+
+    TEST("optional char", optional<char>);
+    TEST("optional int", optional<int>);
+    TEST("optional empty_t1", optional<empty_t1>);
+    TEST("optional of optional", optional<optional<char>>);
 
     return 0;
 }
