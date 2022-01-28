@@ -157,13 +157,6 @@ namespace std {
         bool has_value;
     };
 
-    //! placeholder type for use as the first alternative in a variant of non-default-constructible types
-    struct monostate {};
-
-    //! a type-safe discriminated union
-    template <typename... T>
-    struct variant;
-
     //! dynamic contiguous array
     template <typename T, typename A = allocator<T>>
     struct vector;
