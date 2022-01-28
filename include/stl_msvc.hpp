@@ -166,6 +166,13 @@ namespace std {
         T* cap;
     };
 
+    //! vector of bool specialization
+    template <typename A>
+    struct vector<bool, A> {
+        vector<unsigned int, A> data;
+        size_t count;
+    };
+
     //! double-ended queue
     template <typename T, typename A = allocator<T>>
     struct deque;
