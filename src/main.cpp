@@ -2,9 +2,11 @@
 #include <bitset>
 #include <functional>
 #include <map>
+#include <optional>
 #include <set>
 #include <span>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -34,6 +36,11 @@ int main() {
 
     TEST("pair of ints", pair<int, int>);
     TEST("pair of int and char", pair<int, char>);
+
+    TEST("string_view", string_view);
+    TEST("u8string_view", u8string_view);
+    TEST("u16string_view", u16string_view);
+    TEST("u32string_view", u32string_view);
 
     return 0;
 }

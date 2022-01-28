@@ -103,7 +103,10 @@ namespace std {
 
     //! stores and manipulates sequences of characters
     template <typename C, typename T = char_traits<C>>
-    struct basic_string_view;
+    struct basic_string_view {
+        C* data;
+        size_t size;
+    };
 
     //! stores and manipulates sequences of narow character
     using string_view = basic_string_view<char>;
