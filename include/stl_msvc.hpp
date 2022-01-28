@@ -64,6 +64,13 @@ namespace std {
     template <bool Condition, typename TrueT, typename FalseT>
     using conditional_t = typename conditional<Condition, TrueT, FalseT>::type;
 
+    //! a wrapper that may or may not hold an object
+    template <typename T>
+    struct optional {
+        T value;
+        bool has_value;
+    };
+
     //! implements binary tuple, i.e. a pair of values
     template <typename T0, typename T1>
     struct pair {
@@ -149,13 +156,6 @@ namespace std {
 
     //! stores and manipulates sequences of utf32 character
     using u32string = basic_string<char32_t>;
-
-    //! a wrapper that may or may not hold an object
-    template <typename T>
-    struct optional {
-        T value;
-        bool has_value;
-    };
 
     //! dynamic contiguous array
     template <typename T, typename A = allocator<T>>
