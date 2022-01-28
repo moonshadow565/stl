@@ -89,16 +89,16 @@ namespace std {
     //! @note size is known at compiletime
     template <typename T, size_t E = (size_t)-1>
     struct span {
-        T* ptr;
-        static constexpr inline size_t count = E;
+        T* data;
+        static constexpr inline size_t size = E;
     };
 
     //! a non-owning view over a contiguous sequence of objects
     //! @note size is only known at runtime
     template <typename T>
     struct span<T, (size_t)-1> {
-        T* ptr;
-        size_t count;
+        T* data;
+        size_t size;
     };
 
     //! stores and manipulates sequences of characters
@@ -127,10 +127,10 @@ namespace std {
     template <typename C, typename T = char_traits<C>, typename A = allocator<C>>
     struct basic_string {
         static_assert(sizeof(C) <= 8, "We need to be able to fit at least 2 chars in SSO buffer(16 bytes)!");
-        union storage {
+        union data_t {
             C* big;
             C small[16 / sizeof(C)];
-        } storage;
+        } data;
         size_t size;
         size_t reserved;
     };
