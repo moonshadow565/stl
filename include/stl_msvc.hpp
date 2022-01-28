@@ -169,13 +169,14 @@ namespace std {
     //! vector of bool specialization
     template <typename A>
     struct vector<bool, A> {
+        struct iterator {
+            unsigned int* ptr;
+            size_t offset;
+        };
+
         vector<unsigned int, A> data;
         size_t count;
     };
-
-    //! double-ended queue
-    template <typename T, typename A = allocator<T>>
-    struct deque;
 
     //! singly-linked list
     template <typename T, typename A = allocator<T>>
@@ -224,6 +225,10 @@ namespace std {
               typename E = equal_to<K>,
               typename A = allocator<pair<K, V>>>
     struct unordered_multimap;
+
+    //! double-ended queue
+    template <typename T, typename A = allocator<T>>
+    struct deque;
 
     //! adapts a container to provide stack (LIFO data structure)
     template <typename T, typename C = deque<T>>

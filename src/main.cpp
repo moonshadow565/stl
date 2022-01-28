@@ -2,12 +2,15 @@
 #define private public
 #include <array>
 #include <bitset>
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory_resource>
 #include <optional>
+#include <queue>
 #include <set>
 #include <span>
+#include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -75,7 +78,6 @@ int main() {
     TEST("optional of optional", optional<optional<char>>);
 
     TEST("vector of char", vector<char>);
-    TEST("vector of char with allocator", vector<char, std::pmr::polymorphic_allocator<char>>);
 
     return 0;
 }
