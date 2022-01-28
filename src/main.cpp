@@ -42,5 +42,10 @@ int main() {
     TEST("u16string_view", u16string_view);
     TEST("u32string_view", u32string_view);
 
+    TEST("string", string);
+    TEST("u8string", u8string);
+    TEST("u16string", u16string);
+    TEST("u32string", u32string);
+
     return 0;
 }

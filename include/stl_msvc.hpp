@@ -125,7 +125,15 @@ namespace std {
 
     //! stores and manipulates sequences of characters
     template <typename C, typename T = char_traits<C>, typename A = allocator<C>>
-    struct basic_string {};
+    struct basic_string {
+        static_assert(sizeof(C) <= 8, "We need to be able to fit at least 2 chars in SSO buffer(16 bytes)!");
+        union storage {
+            C* big;
+            C small[16 / sizeof(C)];
+        } storage;
+        size_t size;
+        size_t reserved;
+    };
 
     //! stores and manipulates sequences of narow character
     using string = basic_string<char>;
