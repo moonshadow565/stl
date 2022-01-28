@@ -44,6 +44,26 @@ namespace std {
     template <typename T>
     struct default_delete {};
 
+    //! conditonal::type is TrueT or FalseT depending on Condition
+    template <bool Condition, typename TrueT, typename FalseT>
+    struct conditional;
+
+    //! conditonal::type is TrueT
+    template <typename TrueT, typename FalseT>
+    struct conditional<true, TrueT, FalseT> {
+        using type = TrueT;
+    };
+
+    //! conditonal::type is FalseT
+    template <typename TrueT, typename FalseT>
+    struct conditional<false, TrueT, FalseT> {
+        using type = FalseT;
+    };
+
+    //! conditonal_t is TrueT or FalseT depending on Condition
+    template <bool Condition, typename TrueT, typename FalseT>
+    using conditonal_t = typename conditional<Condition, TrueT, FalseT>::type;
+
     //! implements binary tuple, i.e. a pair of values
     template <typename T0, typename T1>
     struct pair;
