@@ -44,9 +44,44 @@ namespace std {
     template <typename T>
     struct default_delete {};
 
+    //! implements binary tuple, i.e. a pair of values
+    template <typename T0, typename T1>
+    struct pair;
+
+    //! static contiguous array
+    template <typename T, size_t N>
+    struct array;
+
+    //! implements constant length bit array
+    template <size_t N>
+    struct bitset;
+
+    //! a non-owning view over a contiguous sequence of objects
+    template <typename T, size_t E = (size_t)-1>
+    struct span;
+
+    //! stores and manipulates sequences of characters
+    template <typename C, typename T = char_traits<C>>
+    struct basic_string_view;
+
+    //! stores and manipulates sequences of narow character
+    using string_view = basic_string_view<char>;
+
+    //! stores and manipulates sequences of wide character
+    using wstring_view = basic_string_view<wchar_t>;
+
+    //! stores and manipulates sequences of utf8 character
+    using u8string_view = basic_string_view<char>;
+
+    //! stores and manipulates sequences of utf16 character
+    using u16string_view = basic_string_view<char16_t>;
+
+    //! stores and manipulates sequences of utf32 character
+    using u32string_view = basic_string_view<char32_t>;
+
     //! stores and manipulates sequences of characters
     template <typename C, typename T = char_traits<C>, typename A = allocator<C>>
-    struct basic_string;
+    struct basic_string {};
 
     //! stores and manipulates sequences of narow character
     using string = basic_string<char>;
@@ -63,29 +98,6 @@ namespace std {
     //! stores and manipulates sequences of utf32 character
     using u32string = basic_string<char32_t>;
 
-    //! stores and manipulates sequences of characters
-    template <typename C, typename T = char_traits<C>, typename A = allocator<C>>
-    struct basic_string_view;
-
-    //! stores and manipulates sequences of narow character
-    using string_view = basic_string_view<char>;
-
-    //! stores and manipulates sequences of wide character
-    using wstring_view = basic_string_view<wchar_t>;
-
-    //! stores and manipulates sequences of utf8 character
-    using u8string_view = basic_string_view<char>;
-
-    //! stores and manipulates sequences of utf16 character
-    using u16string_view = basic_string_view<char16_t>;
-
-    //! stores and manipulates sequences of utf32 character
-    using u32string = basic_string<char32_t>;
-
-    //! a non-owning view over a contiguous sequence of objects
-    template <typename T, size_t E = (size_t)-1>
-    struct span;
-
     //! a wrapper that may or may not hold an object
     template <typename T>
     struct option;
@@ -96,18 +108,6 @@ namespace std {
     //! a type-safe discriminated union
     template <typename... T>
     struct variant;
-
-    //! implements binary tuple, i.e. a pair of values
-    template <typename T0, typename T1>
-    struct pair;
-
-    //! static contiguous array
-    template <typename T, size_t N>
-    struct array;
-
-    //! implements constant length bit array
-    template <size_t N>
-    struct bitset;
 
     //! dynamic contiguous array
     template <typename T, typename A = allocator<T>>
