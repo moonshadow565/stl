@@ -159,7 +159,12 @@ namespace std {
 
     //! dynamic contiguous array
     template <typename T, typename A = allocator<T>>
-    struct vector;
+    struct vector : A {
+        // [[msvc::no_unique_address]] A alloc;
+        T* beg;
+        T* end;
+        T* cap;
+    };
 
     //! double-ended queue
     template <typename T, typename A = allocator<T>>

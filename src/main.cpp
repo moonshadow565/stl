@@ -1,7 +1,10 @@
+#define _ALLOW_KEYWORD_MACROS
+#define private public
 #include <array>
 #include <bitset>
 #include <functional>
 #include <map>
+#include <memory_resource>
 #include <optional>
 #include <set>
 #include <span>
@@ -30,6 +33,14 @@
 
 struct empty_t1 {};
 struct empty_t2 {};
+
+template <typename T>
+struct fake_less {
+    void* junk[16 / sizeof(void*)];
+    bool operator()(T const&, T const&) const noexcept { return true; }
+};
+
+struct undefined;
 
 int main() {
     TEST("array basic", array<char, 1>);
@@ -62,6 +73,9 @@ int main() {
     TEST("optional int", optional<int>);
     TEST("optional empty_t1", optional<empty_t1>);
     TEST("optional of optional", optional<optional<char>>);
+
+    TEST("vector of char", vector<char>);
+    TEST("vector of char with allocator", vector<char, std::pmr::polymorphic_allocator<char>>);
 
     return 0;
 }
