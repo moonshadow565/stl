@@ -67,9 +67,11 @@ namespace std {
         word_t words[N == 0 ? 1 : (N + words_per_bit - 1) / words_per_bit];
     };
 
+    inline constexpr size_t dynamic_extent = (size_t)-1;
+
     //! a non-owning view over a contiguous sequence of objects
     //! @note size is known at compiletime
-    template <typename T, size_t E = (size_t)-1>
+    template <typename T, size_t E = dynamic_extent>
     struct span {
         using iterator = T*;
 
@@ -80,7 +82,7 @@ namespace std {
     //! a non-owning view over a contiguous sequence of objects
     //! @note size is only known at runtime
     template <typename T>
-    struct span<T, (size_t)-1> {
+    struct span<T, dynamic_extent> {
         using iterator = T*;
 
         T* data;
