@@ -1,4 +1,5 @@
 #pragma once
+
 #ifdef STL_NS
 namespace STL_NS {
 #else
@@ -11,14 +12,12 @@ namespace std {
     using uint32_t = unsigned int;
     using int64_t = signed long long;
     using uint64_t = unsigned long long;
-    using size_t = ::size_t;
+    using size_t = unsigned long;
 #endif
-    struct __std_type_info_data {
-        const char* _UndecoratedName;
-        const char _DecoratedName[1];
+    struct type_info {
+        virtual ~type_info() = 0;
+        const char* name;
     };
-
-    using type_info = __std_type_info_data;
 
     //! a wrapper that may or may not hold an object
     template <typename T>
@@ -43,9 +42,12 @@ namespace std {
     //! implements constant length bit array
     template <size_t N>
     struct bitset {
-        static constexpr auto zero_word = []{ if constexpr (N <= sizeof(unsigned) * 9) return 0u; else return 0ull; }();
-        using word_t = decltype(zero_word);
-        word_t words[N == 0 ? 1 : (N + (sizeof(word_t) * 8  - 1)) / (sizeof(word_t) * 8)];
+        size_t words[(N - 1) / (sizeof(size_t) * 8) + 1];
+    };
+
+    template <>
+    struct bitset<0> {
+        unsigned char nothing[1];
     };
 
     inline constexpr size_t dynamic_extent = (size_t)-1;
@@ -91,14 +93,21 @@ namespace std {
     //! stores and manipulates sequences of characters
     template <typename C>
     struct basic_string {
-        static_assert(sizeof(C) <= 8, "We need to be able to fit at least 2 chars in SSO buffer(16 bytes)!");
-        union data_t {
-            C* big;
-            C small[16 / sizeof(C)];
+        struct big_t {
+            size_t cap;
+            size_t size;
+            C* data;
         };
+        struct small_t {
+            unsigned char size;
+            C data[(sizeof(big_t) - 1) / sizeof(C)];
+        };
+        union data_t {
+            big_t big;
+            small_t small;
+        };
+        static_assert(sizeof(C) <= 8, "We need to be able to fit at least 2 chars in SSO buffer(16 bytes)!");
         data_t data;
-        size_t size;
-        size_t reserved;
     };
 
     //! stores and manipulates sequences of narow character
@@ -127,8 +136,9 @@ namespace std {
     //! vector of bool specialization
     template <>
     struct vector<bool> {
-        vector<unsigned int> data;
+        size_t* data;
         size_t size;
+        size_t cap;
     };
 
     template <typename T>
@@ -153,33 +163,46 @@ namespace std {
     //! doubly-linked list
     template <typename T>
     struct list {
-        list_node<T>* head;
+        list_node<T>* null;
+        list_node<T>* beg;
         size_t size;
     };
 
     template <typename Item, bool Multi>
     struct rb_node {
         rb_node* left;
-        rb_node* parent;
         rb_node* right;
+        rb_node* parent;
         bool is_black;
-        bool is_nil;
         Item item;
     };
 
+
     template <typename Item, bool Multi>
     struct rb_tree {
-        rb_node<Item, Multi>* head;
+        union {
+            rb_node<Item, Multi>* begin;
+            rb_node<Item, Multi>** begin_ref;
+        };
+        rb_node<Item, Multi>* end;
         size_t size;
     };
 
     template <typename Item, bool Multi>
+    struct hash_node {
+        hash_node* next;
+        size_t hash;
+        Item item;
+    };
+
+
+    template <typename Item, bool Multi>
     struct hash_table {
-        float traits_obj;
-        list<Item> elems;
-        vector<list_node<Item>*> buckets;
-        size_t mask;
-        size_t max_index;
+        hash_node<Item, Multi>** buckets;
+        size_t buckets_count;
+        hash_node<Item, Multi>* first_node;
+        size_t count;
+        float magic;
     };
 
     //! collection of unique keys, sorted by keys
@@ -217,24 +240,21 @@ namespace std {
     //! double-ended queue
     template <typename T>
     struct deque {
-        void* proxy;
-        T** map; // pointer to array of pointers to blocks
-        size_t mapsize; // size of map array, zero or 2^N
-        size_t offset; // offset of initial element
-        size_t size; // current length of sequence
+        T* first;
+        T* begin;
+        T* end;
+        T* cap;
+        size_t start;
+        size_t size;
     };
 
     //! adapts a container to provide stack (LIFO data structure)
     template <typename T, typename C = deque<T>>
-    struct stack {
-        C container;
-    };
+    struct stack : C {};
 
     //! adapts a container to provide queue (FIFO data structure)
     template <typename T, typename C = deque<T>>
-    struct queue {
-        C container;
-    };
+    struct queue : C {};
 
     //! default deleter for unique_ptr
     template <typename T>
@@ -247,12 +267,12 @@ namespace std {
     };
 
     struct ref_count_base {
-        virtual void destroy() noexcept = 0;
-        virtual void delete_this() noexcept = 0;
         virtual ~ref_count_base() noexcept = 0;
-        virtual void* get_deleter(type_info const& tinfo) const noexcept = 0;
-        unsigned long uses;
-        unsigned long weaks;
+        virtual void on_zero_shared() noexcept = 0;
+        virtual void* get_deleter() const noexcept = 0;
+        virtual void on_zero_weak() noexcept = 0;
+        long uses;
+        long weaks;
     };
 
     //! smart pointer with shared object ownership semantics
@@ -275,64 +295,62 @@ namespace std {
         weak_ptr<T> this_weak_ptr;
     };
 
+    //! inner type of std::function    
     template <typename RetT, typename... ArgT>
     struct function_impl {
-        virtual function_impl* copy(void* dst) const = 0;
-        virtual function_impl* move(void* dst) noexcept = 0;
+        virtual ~function_impl() = 0;
+        virtual function_impl* clone() const = 0;
+        virtual void clone_into(function_impl* dst) const = 0;
+        virtual void destroy() noexcept = 0;
+        virtual void destroy_deallocate() noexcept = 0;
         virtual RetT call(ArgT&&...) = 0;
+        virtual const void* target(const type_info& tyinfo) const noexcept = 0;
         virtual const type_info& traget_type() const noexcept = 0;
-        virtual const void* get() const noexcept = 0;
     };
 
     //! wraps callable object of any copy constructible type with specified function call signature
     template <typename F>
     struct function;
 
+    //! wraps callable object of any copy constructible type with specified function call signature
     template <typename RetT, typename... ArgT>
     struct function<RetT(ArgT...)> {
-        void* storage[5 + 16 / sizeof(void*)];
+        struct alignas(sizeof(void*) * 2) storage {
+            char data[sizeof(void*) * 3];
+        } storage;
         function_impl<RetT, ArgT...>* impl;
     };
 
     struct thread {
         void* handle;
-        unsigned int id;
     };
 
     struct mutex {
-#ifdef _CRT_WINDOWS
-        size_t internal[sizeof(void*) == 8 ? 4 : 5];
-#else
-        size_t internal[sizeof(void*) == 8 ? 10 : 12];
-#endif
+        size_t internal[sizeof(void*) == 8 ? 8 : 11];
     };
 
     struct condition_variable {
-#ifdef _CRT_WINDOWS
-        size_t internal[2];
-#else
-        size_t internal[sizeof(void*) == 8 ? 9 : 10];
-#endif
+        size_t internal[sizeof(void*) == 8 ? 6 : 7];
     };
 
     struct recursive_mutex : mutex {};
 
     struct condition_variable_any {
-        shared_ptr<mutex> mutex;
         condition_variable condition;
+        shared_ptr<mutex> mutex;
     };
 
     struct timed_mutex {
         mutex mutex;
         condition_variable condition;
-        unsigned int locked;
+        bool locked;
     };
 
     struct recursive_timed_mutex {
         mutex mutex;
         condition_variable condition;
-        unsigned int locked;
-        unsigned int owner_thread_id;
+        size_t count;
+        void* thread_handle;
     };
 
     template<typename M>

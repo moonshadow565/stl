@@ -2,12 +2,14 @@
 #define private public
 #include <array>
 #include <bitset>
+#include <condition_variable>
 #include <deque>
 #include <forward_list>
 #include <functional>
 #include <list>
 #include <map>
 #include <memory_resource>
+#include <mutex>
 #include <optional>
 #include <queue>
 #include <set>
@@ -15,13 +17,14 @@
 #include <stack>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <variant>
 #include <vector>
 
-#define STL_MSVC_NS test
+#define STL_NS test
 #include "stl_msvc.hpp"
 
 #define TEST(message, ...)                   \
@@ -31,7 +34,7 @@
             return sizeof(__VA_ARGS__);      \
         }() ==                               \
             [] {                             \
-                using namespace STL_MSVC_NS; \
+                using namespace STL_NS;      \
                 return sizeof(__VA_ARGS__);  \
             }(),                             \
         message)
@@ -64,9 +67,6 @@ int main() {
 
     TEST("", span<char, 1>);
     TEST("", span<char, 1>::iterator);
-
-    TEST("", pair<int, int>);
-    TEST("", pair<int, char>);
 
     TEST("", string_view);
     TEST("", string_view::iterator);
@@ -141,6 +141,28 @@ int main() {
     TEST("", weak_ptr<int>);
     TEST("", enable_shared_from_this<int>);
     TEST("", function<int(float, short)>);
+
+    TEST("", deque<int>);
+    TEST("", queue<int>);
+    TEST("", stack<int>);
+
+    TEST("", thread);
+
+    TEST("", mutex);
+
+    TEST("", recursive_mutex);
+
+    TEST("", condition_variable);
+
+    TEST("", condition_variable_any);
+
+    TEST("", timed_mutex);
+
+    TEST("", recursive_timed_mutex);
+
+    TEST("", lock_guard<mutex>);
+
+    TEST("", unique_lock<mutex>);
 
     return 0;
 }
