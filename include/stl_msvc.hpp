@@ -290,7 +290,7 @@ namespace std {
 
     template <typename RetT, typename... ArgT>
     struct function<RetT(ArgT...)> {
-        void* storage[5 + 16 / sizeof(void*)];
+        void* storage[5 + 16 / sizeof(std::size_t)];
         function_impl<RetT, ArgT...>* impl;
     };
 
@@ -301,9 +301,9 @@ namespace std {
 
     struct mutex {
 #ifdef _CRT_WINDOWS
-        size_t internal[sizeof(void*) == 8 ? 4 : 5];
+        size_t internal[sizeof(std::size_t) == 8 ? 4 : 5];
 #else
-        size_t internal[sizeof(void*) == 8 ? 10 : 12];
+        size_t internal[sizeof(std::size_t) == 8 ? 10 : 12];
 #endif
     };
 
@@ -311,7 +311,7 @@ namespace std {
 #ifdef _CRT_WINDOWS
         size_t internal[2];
 #else
-        size_t internal[sizeof(void*) == 8 ? 9 : 10];
+        size_t internal[sizeof(std::size_t) == 8 ? 9 : 10];
 #endif
     };
 

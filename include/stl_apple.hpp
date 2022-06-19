@@ -315,10 +315,9 @@ namespace std {
     //! wraps callable object of any copy constructible type with specified function call signature
     template <typename RetT, typename... ArgT>
     struct function<RetT(ArgT...)> {
-        struct alignas(sizeof(void*) * 2) storage {
-            char data[sizeof(void*) * 3];
-        } storage;
+        char storage[sizeof(std::size_t) == 4 ? 16 : 24];
         function_impl<RetT, ArgT...>* impl;
+        char padding[sizeof(std::size_t) == 4 ? 4 : 0];
     };
 
     struct thread {
@@ -326,11 +325,11 @@ namespace std {
     };
 
     struct mutex {
-        size_t internal[sizeof(void*) == 8 ? 8 : 11];
+        size_t internal[sizeof(std::size_t) == 8 ? 8 : 11];
     };
 
     struct condition_variable {
-        size_t internal[sizeof(void*) == 8 ? 6 : 7];
+        size_t internal[sizeof(std::size_t) == 8 ? 6 : 7];
     };
 
     struct recursive_mutex : mutex {};
